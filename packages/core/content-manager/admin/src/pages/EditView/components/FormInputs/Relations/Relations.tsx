@@ -752,7 +752,10 @@ const RelationModalWithContext = ({
 
   React.useLayoutEffect(() => {
     setTextValue('');
-  }, [fieldValue]);
+    // Picking a relation leaves its label in the input, so the search query must be cleared too,
+    // otherwise re-opening the dropdown only searches for the entry that was just selected.
+    setSearchParams((s) => ({ ...s, _q: '', page: 1 }));
+  }, [fieldValue, setSearchParams]);
 
   const handleSearch = async (search: string) => {
     setSearchParams((s) => ({ ...s, _q: search, page: 1 }));
@@ -797,9 +800,6 @@ const RelationModalWithContext = ({
           }
           hasMoreItems={hasNextPage}
           loading={isLoadingSearchRelations || isLoadingPermissions}
-          onOpenChange={() => {
-            handleSearch(textValue ?? '');
-          }}
           noOptionsMessage={() =>
             formatMessage({
               id: getTranslation('relation.notAvailable'),
